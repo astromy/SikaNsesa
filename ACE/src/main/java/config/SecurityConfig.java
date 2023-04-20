@@ -83,6 +83,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.POST, "/recieveOrder").permitAll()
         .antMatchers(HttpMethod.GET, "/serviceGet/**").permitAll()
         .antMatchers(HttpMethod.POST, "/servicePost/**").permitAll()
+        .antMatchers(HttpMethod.POST, "/bapi/**").permitAll()
         .antMatchers(HttpMethod.DELETE, "/books/**").hasRole("ADMIN");
 	}
 	

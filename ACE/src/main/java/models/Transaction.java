@@ -1,6 +1,7 @@
 package models;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -33,7 +34,7 @@ public class Transaction implements Serializable {
 	@Column(name = "recipientBank")
 	private String recipientBank;
 	@Column(name = "transactionDate")
-	private Date transactionDate;
+	private LocalDateTime transactionDate;
 	@Column(name = "recipientCurrency")
 	private String recipientCurrency;
 	@Column(name = "recipientAmount")
@@ -59,7 +60,7 @@ public class Transaction implements Serializable {
 
 
 	public Transaction(Long idTransaction, String sender, String senderCurrency, Double senderAmount, String recipient,
-			String recipientBank, Date transactionDate, String recipientCurrency, Double recipientAmount,
+			String recipientBank, LocalDateTime transactionDate, String recipientCurrency, Double recipientAmount,
 			OperatingCountries senderCountries, OperatingCountries destinationCountry, Status status) {
 		super();
 		this.idTransaction = idTransaction;
@@ -118,12 +119,12 @@ public class Transaction implements Serializable {
 		this.recipient = recipient;
 	}
 
-	public Date getTransactionDate() {
+	public LocalDateTime getTransactionDate() {
 		return transactionDate;
 	}
 
-	public void setTransactionDate(Date transactionDate) {
-		this.transactionDate = transactionDate;
+	public void setTransactionDate(LocalDateTime localDateTime) {
+		this.transactionDate = localDateTime;
 	}
 
 	public String getRecipientCurrency() {

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import aceservice.ACEService;
+import dto.BankTransactionDTO;
 import dto.TransferOrderDTO;
 import models.OperatingCountries;
 
@@ -72,17 +73,13 @@ public class ServiceController {
 
 	}
 
-	/*@ResponseBody
-	@RequestMapping(value = { "/servicePost/checkSenderAccount" }, method = RequestMethod.POST, consumes = {
+	@ResponseBody
+	@RequestMapping(value = { "/bapi/cdt" }, method = RequestMethod.POST, consumes = {
 			MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
-	public String checkContact(@RequestBody String deviceId) {
-		try {
-			
-		} catch (Exception e) {
-			
-		}
-		return null;
-	}*/
+	public ResponseEntity<String> PBT(@RequestBody  BankTransactionDTO jsonString) {
+		
+		return aceService.BankTransaction(jsonString);
+	}
 
 	/*@ResponseBody
 	@RequestMapping(value = { "/servicePost/deviceToken" }, method = RequestMethod.POST, consumes = {

@@ -16,7 +16,7 @@ public class TransferOrderDTO implements Serializable {
 	private String recipientCurrency;
 	private String senderCountries;
 	private String bank;
-	private String emial;
+	private String email;
 	private String destinationCountry;
 
 
@@ -27,7 +27,7 @@ public class TransferOrderDTO implements Serializable {
 
 
 	public TransferOrderDTO(String sender, String senderCurrency, Double senderAmount, String recipient,
-			String recipientCurrency, String senderCountries, String bank, String emial, String destinationCountry) {
+			String recipientCurrency, String senderCountries, String bank, String email, String destinationCountry) {
 		super();
 		this.sender = sender;
 		this.senderCurrency = senderCurrency;
@@ -36,16 +36,16 @@ public class TransferOrderDTO implements Serializable {
 		this.recipientCurrency = recipientCurrency;
 		this.senderCountries = senderCountries;
 		this.bank = bank;
-		this.emial = emial;
+		this.email = email;
 		this.destinationCountry = destinationCountry;
 	}
 
-	public String getEmial() {
-		return emial;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setEmial(String emial) {
-		this.emial = emial;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 

@@ -1,6 +1,7 @@
 package models;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -27,7 +28,7 @@ public class TransactionCommissions implements Serializable {
 	@Column(name = "commisionAmount")
 	private Double commisionAmount;
 	@Column(name = "dateTime")
-	private Date transCommisionDate;
+	private LocalDateTime transCommisionDate;
 
 	@ManyToOne
 	@JoinColumn(name = "transaction")
@@ -44,7 +45,7 @@ public class TransactionCommissions implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public TransactionCommissions(Long idtransactionCommision, Double commisionAmount, Date transCommisionDate,
+	public TransactionCommissions(Long idtransactionCommision, Double commisionAmount, LocalDateTime transCommisionDate,
 			Transaction transaction, OperatingCountries senderCountry) {
 		super();
 		this.idtransactionCommision = idtransactionCommision;
@@ -70,12 +71,12 @@ public class TransactionCommissions implements Serializable {
 		this.commisionAmount = commisionAmount;
 	}
 
-	public Date getTransCommisionDate() {
+	public LocalDateTime getTransCommisionDate() {
 		return transCommisionDate;
 	}
 
-	public void setTransCommisionDate(Date transCommisionDate) {
-		this.transCommisionDate = transCommisionDate;
+	public void setTransCommisionDate(LocalDateTime localDateTime) {
+		this.transCommisionDate = localDateTime;
 	}
 
 	public Transaction getTransaction() {

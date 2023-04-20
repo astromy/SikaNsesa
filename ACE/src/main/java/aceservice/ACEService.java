@@ -35,13 +35,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import dto.BankTransactionDTO;
 import dto.TransferOrderDTO;
 import models.Bank;
 import models.BankTransaction;
 import models.CommissionRates;
 import models.OperatingCountries;
 import models.RecipeintTransaction;
+import models.SenderTransactions;
 import models.Transaction;
+import models.TransactionCommissions;
 import repository.BankRepository;
 import repository.BankTransactionRepository;
 import repository.CommisionRateRepository;
@@ -119,6 +122,7 @@ public class ACEService {
 					+ AceRecievingCommission + "\nTotal Commission ="
 					+ (AceCommission + AceSendingBankCommission + AceRecievingCommission));
 
+			OperatingCountries oc=operatingCountryRepository.findByName(jsonString.getDestinationCountry());
 			Transaction transaction = transactionRepository.findTransactionByReciept(jsonString.getSender(),
 					jsonString.getSenderCurrency(), jsonString.getSenderAmount());
 			if (transaction != null) {
@@ -130,14 +134,14 @@ public class ACEService {
 				transaction.setDestinationCountry(
 						operatingCountryRepository.findByName(jsonString.getDestinationCountry()));
 				transaction.setRecipientCurrency(jsonString.getRecipientCurrency());
-				transaction.setStatus(statusRepository.findStatusByName(""));
+				transaction.setStatus(statusRepository.findStatusByName("successful"));
 
 				rt.setAmount(transAmount);
-				rt.setRecipientCountry(operatingCountryRepository.findByName(jsonString.getDestinationCountry()));
+				rt.setRecipientCountry(oc);
 				rt.setTransaction(transaction);
-				;
 				rt.setSender(jsonString.getSender());
-				rt.setStatus(statusRepository.findStatusByName(""));
+				rt.setStatus(statusRepository.findStatusByName("successful"));
+				rt.setRecipientCountry(oc);
 				rt.setDateTime(LocalDateTime.now());
 				List<Bank> b = bankRepository.findBankByBalanceAndCountry(transAmount,
 						operatingCountryRepository.findByName(jsonString.getDestinationCountry()));
@@ -156,20 +160,22 @@ public class ACEService {
 
 				BankTransaction bt = new BankTransaction();
 				bt.setBank(rt.getBank());
-				bt.setBanktransactionAmount(AceRecievingCommission);
-				bt.setBanktransactionCommentary("Reciepient Commission for Transfer");
+				bt.setBanktransactionAmount(transAmount+AceRecievingCommission);
+				bt.setBanktransactionCommentary("Recieving Operation");
 				bt.setBanktransactionCountry(rt.getRecipientCountry());
 				bt.setBanktransactionCurrency(jsonString.getRecipientCurrency());
 				bt.setBanktransactionDate(LocalDateTime.now());
 				bt.setBanktransactionReciept(jsonString.getSender());
 				bt.setBanktransactionType("Recieving");
-				bt.setStatus(statusRepository.findStatusByName("Successful"));
+				bt.setStatus(statusRepository.findStatusByName("successful"));
 				bt.setBanktransactionBalance(bnk.getBankBalance());
 
 				transactionRepository.save(transaction);
 				recipientTransactionRepository.save(rt);
 				bankTransactionRepository.save(bt);
 				bankRepository.save(bnk);
+
+				return new ResponseEntity<String>("Transaction Successful", HttpStatus.OK);
 			}
 
 		} catch (Exception e) {
@@ -185,7 +191,6 @@ public class ACEService {
 	}
 
 	public List<Object> getAllCountries() {
-		// momoService.CreateAPIUser();
 		List<Object> operatingCountryList = new ArrayList<Object>();
 		try {
 			operatingCountryList = operatingCountryRepository.findCountryList();
@@ -243,13 +248,76 @@ public class ACEService {
 
 	}
 
-	public String checkContact(@RequestBody String deviceId) {
+	public ResponseEntity<String> BankTransaction(@RequestBody BankTransactionDTO bankTransaction) {
 		try {
+			if (bankTransaction.getAmount() > 0 && bankTransaction.getBank() != null
+					&& bankTransaction.getCountry() != null && bankTransaction.getCurrency() != null
+					&& bankTransaction.getRecieptNumber() != null && bankTransaction.getCurrency() != null) {
+				OperatingCountries oc = operatingCountryRepository.findByName(bankTransaction.getCountry());
+				Transaction transaction = new Transaction();
+				transaction.setSenderAmount(bankTransaction.getAmount());
+				transaction.setSenderCurrency(bankTransaction.getCurrency());
+				transaction.setSenderCountries(oc);
+				transaction.setDestinationCountry(oc);
+				transaction.setSender(bankTransaction.getRecieptNumber());
+				transaction.setStatus(statusRepository.findStatusByName("successful"));
+				transaction.setTransactionDate(LocalDateTime.now());
 
+				BankTransaction bt = new BankTransaction();
+
+				List<CommissionRates> cr = commissionRateRepository.findCurrentRate();
+				Double sendCommissionRate = (cr.get(cr.size() - 1).getSendingBank() / 100);
+				Double AceSendingBankCommission = bankTransaction.getAmount() * sendCommissionRate;
+
+				Double CommissionRate = (cr.get(cr.size() - 1).getRates() / 100);
+				Double recieveCommissionRate = (cr.get(cr.size() - 1).getRecievingBank() / 100);
+				Double tAmount = bankTransaction.getAmount() * (1 - CommissionRate);
+				Double AceRecievingCommission = bankTransaction.getAmount() * recieveCommissionRate;
+				Double AceCommission = (bankTransaction.getAmount() - tAmount) - AceSendingBankCommission
+						- AceRecievingCommission;
+
+				TransactionCommissions tc = new TransactionCommissions();
+				tc.setCommisionAmount(AceCommission);
+				tc.setSenderCountry(oc);
+				tc.setTransCommisionDate(LocalDateTime.now());
+				tc.setTransaction(transaction);
+				
+
+				Bank bk = bankRepository.findBankByNameAndCountry(bankTransaction.getBank(),
+						transaction.getSenderCountries());
+				bk.setBankBalance(bk.getBankBalance() + AceSendingBankCommission);
+				
+				SenderTransactions st= new SenderTransactions();
+				st.setAmount(AceSendingBankCommission);
+				st.setDateTime(LocalDateTime.now());
+				st.setSender(bankTransaction.getRecieptNumber());
+				st.setSenderCountry(oc);
+				st.setStatus(statusRepository.findStatusByName("successful"));
+				st.setTransaction(transaction);
+				st.setBank(bk);
+
+				bt.setBank(bk);
+				bt.setBanktransactionAmount(bankTransaction.getAmount());
+				bt.setBanktransactionCommentary("Transfer Operation");
+				bt.setBanktransactionCountry(oc);
+				bt.setBanktransactionCurrency(bankTransaction.getCurrency());
+				bt.setBanktransactionType("Sending");
+				bt.setBanktransactionReciept(bankTransaction.getRecieptNumber());
+				bt.setStatus(statusRepository.findStatusByName("successful"));
+				bt.setBanktransactionDate(LocalDateTime.now());
+				bt.setBanktransactionBalance(bk.getBankBalance());
+
+				bankTransactionRepository.save(bt);
+				transactionRepository.save(transaction);
+				senderTransactionRepository.save(st);
+				transactionCommisionRepository.save(tc);
+
+				return new ResponseEntity<String>("Transaction Successful", HttpStatus.OK);
+			}
 		} catch (Exception e) {
-
+			return new ResponseEntity<String>("Transaction Failed", HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<String>("Transaction Failed", HttpStatus.OK);
 	}
 
 	public Boolean UpdateToken(@RequestBody String deviceToken) {

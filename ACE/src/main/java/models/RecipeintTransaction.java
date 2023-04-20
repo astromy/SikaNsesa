@@ -47,7 +47,7 @@ public class RecipeintTransaction implements Serializable {
 	private Transaction transaction;
 
 	@ManyToOne
-	@JoinColumn(name = "sendertransactionBank")
+	@JoinColumn(name = "recipienttransactionBank")
 	@JsonIgnore
 	private Bank bank;
 

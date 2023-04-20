@@ -32,6 +32,11 @@ public class Bank {
 	@JsonIgnore
 	private OperatingCountries bankCountry;
 
+	public Bank() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
 	public Bank(int idbanks, String bankName, String bankCode, String banksHook, Double bankBalance,
 			OperatingCountries bankCountry) {
 		super();

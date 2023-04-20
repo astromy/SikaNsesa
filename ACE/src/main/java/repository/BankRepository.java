@@ -11,8 +11,8 @@ import models.OperatingCountries;
 @Repository
 public interface BankRepository extends Base<Bank, Integer> {
 
-	@Query("SELECT b FROM Bank b where b.bankName =:name")
-	public Bank findBankByName(@Param("name")String name);
+	@Query("SELECT b FROM Bank b where b.bankName =:name AND b.bankCountry=:country")
+	public Bank findBankByNameAndCountry(@Param("name")String name,@Param("country")OperatingCountries country);
 	@Query("SELECT b FROM Bank b where b.bankCountry =:country")
 	public List<Bank> findBankByCountry(@Param("country")OperatingCountries country);
 	@Query("SELECT b FROM Bank b where b.bankBalance =:balance AND b.bankCountry=:country")

@@ -1,6 +1,7 @@
 package models;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,7 +30,7 @@ public class SenderTransactions implements Serializable {
 	@Column(name = "sender")
 	private String sender;
 	@Column(name = "dateTime")
-	private DateTime dateTime;
+	private LocalDateTime dateTime;
 
 	@ManyToOne
 	@JoinColumn(name = "senderCountry")
@@ -56,8 +57,10 @@ public class SenderTransactions implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public SenderTransactions(Long idSenderTransaction, Double amount, String sender, DateTime dateTime,
-			OperatingCountries senderCountry, Status status, Transaction transaction) {
+
+
+	public SenderTransactions(Long idSenderTransaction, Double amount, String sender, LocalDateTime dateTime,
+			OperatingCountries senderCountry, Status status, Transaction transaction, Bank bank) {
 		super();
 		this.idSenderTransaction = idSenderTransaction;
 		this.amount = amount;
@@ -66,6 +69,17 @@ public class SenderTransactions implements Serializable {
 		this.senderCountry = senderCountry;
 		this.status = status;
 		this.transaction = transaction;
+		this.bank = bank;
+	}
+
+
+
+	public Bank getBank() {
+		return bank;
+	}
+
+	public void setBank(Bank bank) {
+		this.bank = bank;
 	}
 
 	public Long getIdSenderTransaction() {
@@ -92,11 +106,11 @@ public class SenderTransactions implements Serializable {
 		this.sender = sender;
 	}
 
-	public DateTime getDateTime() {
+	public LocalDateTime getDateTime() {
 		return dateTime;
 	}
 
-	public void setDateTime(DateTime dateTime) {
+	public void setDateTime(LocalDateTime dateTime) {
 		this.dateTime = dateTime;
 	}
 
